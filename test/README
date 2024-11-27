@@ -1,11 +1,4 @@
+# What to fix with new version of PCB
 
-This directory is intended for PlatformIO Test Runner and project tests.
-
-Unit Testing is a software testing method by which individual units of
-source code, sets of one or more MCU program modules together with associated
-control data, usage procedures, and operating procedures, are tested to
-determine whether they are fit for use. Unit testing finds problems early
-in the development cycle.
-
-More information about PlatformIO Unit Testing:
-- https://docs.platformio.org/en/latest/advanced/unit-testing/index.html
+1. Use standardised battery connector to not get the battery polarity wrong
+2. RGB LED is constantly powered from BAT+. Fix this by using a transistor to switch the power to the LED.
