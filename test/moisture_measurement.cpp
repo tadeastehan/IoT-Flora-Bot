@@ -55,7 +55,7 @@ void setup()
 
   // Initialize ADC
   adc1_config_width(ADC_WIDTH_BIT_12);
-  adc1_config_channel_atten(MOISTURE_OUT_CHANNEL, ADC_ATTEN_DB_11); // Attenuation for higher range (up to 3.3V)
+  adc1_config_channel_atten(MOISTURE_OUT_CHANNEL, ADC_ATTEN_DB_12); // Attenuation for higher range (up to 3.3V)
   initialize_adc();
 }
 
