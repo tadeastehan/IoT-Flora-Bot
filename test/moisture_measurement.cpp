@@ -2,9 +2,6 @@
 #include <driver/adc.h>
 #include "esp_adc_cal.h"
 
-// Default Vref in mV (adjust based on your ESP32 calibration data)
-#define DEFAULT_VREF 1100
-
 // Pins
 #define MOISTURE_IN_PIN 5
 #define MOISTURE_OUT_CHANNEL ADC1_CHANNEL_3
