@@ -206,6 +206,7 @@ void readSoilMoisture()
 {
     // Generate PWM signal on MOISTURE_IN
     analogWrite(MOISTURE_IN_PIN, 128); // Set a duty cycle of 50% (analogWrite uses software PWM on GPIO5)
+
     Serial.println("PWM signal generated on MOISTURE_IN_PIN");
 
     // Allow the circuit to stabilize
@@ -246,6 +247,23 @@ void readBME280()
     altitude = bme.readAltitude(SEALEVELPRESSURE_HPA);
 }
 
+void prepareADCatten0()
+{
+    // Set attenuation to 0 dB
+    adc1_config_channel_atten(ADC1_CHANNEL_0, ADC_ATTEN_DB_0);
+    adc1_config_channel_atten(ADC1_CHANNEL_1, ADC_ATTEN_DB_0);
+    adc1_config_channel_atten(ADC1_CHANNEL_9, ADC_ATTEN_DB_0);
+
+    initialize_adc();
+}
+
+void prepareADCatten11()
+{
+    adc1_config_channel_atten(ADC1_CHANNEL_3, ADC_ATTEN_DB_11); // Attenuation for higher range (up to 3.3V)
+
+    initialize_adc_moisture();
+}
+
 void setup()
 {
     // Start serial communication
@@ -261,20 +279,14 @@ void setup()
 
     // Initialize ADC
     adc1_config_width(ADC_WIDTH_BIT_12);
-    adc1_config_channel_atten(ADC1_CHANNEL_0, ADC_ATTEN_DB_0);
-    adc1_config_channel_atten(ADC1_CHANNEL_1, ADC_ATTEN_DB_0);
-    adc1_config_channel_atten(ADC1_CHANNEL_9, ADC_ATTEN_DB_0);
-
-    // Initialize ADC calibration
-    initialize_adc();
-
-    // Initialize ADC for moisture sensor with different attenuation
-    adc1_config_channel_atten(ADC1_CHANNEL_3, ADC_ATTEN_DB_11); // Attenuation for higher range (up to 3.3V)
-    initialize_adc_moisture();
 }
 
 void loop()
 {
+    prepareADCatten0();
+
+    delay(5000);
+
     Serial.println("Reading BME280 sensor...");
     readBME280();
     Serial.print("Temperature: ");
@@ -313,6 +325,10 @@ void loop()
     Serial.println(" mW/cm²");
 
     delay(1000);
+
+    prepareADCatten11();
+
+    delay(5000);
 
     Serial.println("Reading Soil Moisture...");
     readSoilMoisture();
