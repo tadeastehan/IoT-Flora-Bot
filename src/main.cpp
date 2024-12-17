@@ -1,6 +1,9 @@
 #include <Arduino.h>
 #include <driver/adc.h>
 #include "esp_adc_cal.h"
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BME280.h>
 
 // Moisture setup
 #define MOISTURE_IN_PIN 5
@@ -32,6 +35,14 @@ bool bufferFilled = false;
 #define WIDTH ADC_WIDTH_BIT_12
 #define DEFAULT_VREF 1100
 esp_adc_cal_characteristics_t *adc_chars;
+
+// BME280 setup
+#define BME_SDA 13    // SDA (Data) pin connected to pin 13
+#define BME_SCL 14    // SCL (Clock) pin connected to pin 14
+#define BME_EN 21     // Enable pin connected to pin 21 (to power the sensor)
+#define BME_ADDR 0x76 // I2C address of BME280 sensor
+#define SEALEVELPRESSURE_HPA (1013.25)
+Adafruit_BME280 bme; // I2C communication
 
 void initialize_adc()
 {
@@ -193,6 +204,26 @@ int getAveragePercentage()
   return mapMoistureToPercentage(averageMoistureValue);
 }
 
+float getHumidity()
+{
+  return bme.readHumidity();
+}
+
+float getTemperature()
+{
+  return bme.readTemperature();
+}
+
+float getPressure()
+{
+  return bme.readPressure();
+}
+
+float getAltitude()
+{
+  return bme.readAltitude(SEALEVELPRESSURE_HPA);
+}
+
 void setupMoistureSensor()
 {
   // Initialize moisture input pin
@@ -218,12 +249,35 @@ void setupADC()
   initialize_adc();
 }
 
+void setupBME()
+{
+  // Enable BME EN pin to power the sensor
+  pinMode(BME_EN, OUTPUT);
+  digitalWrite(BME_EN, HIGH); // Turn on the sensor
+
+  // Initialize I2C with custom pins
+  Wire.begin(BME_SDA, BME_SCL); // SDA on pin 13, SCL on pin 14
+
+  unsigned status;
+
+  // Initialize BME280 sensor (I2C mode)
+  status = bme.begin(BME_ADDR, &Wire);
+  if (!status)
+  {
+    Serial.println("Could not find a valid BME280 sensor, check wiring, address, sensor ID!");
+    Serial.print("SensorID was: 0x");
+    Serial.println(bme.sensorID(), 16);
+    delay(1000);
+  }
+}
+
 void setup()
 {
   Serial.begin(115200);
 
   setupMoistureSensor();
   setupADC();
+  setupBME();
 }
 
 void startPWM(int pin, int frequency, int dutyCycle)
@@ -262,6 +316,10 @@ void loop()
   int USBVoltage = ReadUSBVoltage();
   int batteryVoltage = ReadBatteryVoltage();
   int lightIntensity = calculateLightIntensity();
+  float temperature = getTemperature();
+  float humidity = getHumidity();
+  float pressure = getPressure();
+  float altitude = getAltitude();
 
   Serial.print(">");
   Serial.print("Moisture:");
@@ -274,7 +332,20 @@ void loop()
   Serial.print(batteryVoltage);
   Serial.print(",");
   Serial.print("LightIntensity:");
-  Serial.print(lightIntensity);
+  Serial.println(lightIntensity);
+
+  Serial.print(">");
+  Serial.print("Temperature:");
+  Serial.print(temperature);
+  Serial.print(",");
+  Serial.print("Humidity:");
+  Serial.print(humidity);
+  Serial.print(",");
+  Serial.print("Pressure:");
+  Serial.print(pressure);
+  Serial.print(",");
+  Serial.print("Altitude:");
+  Serial.print(altitude);
   Serial.println();
 
   // Wait before next measurement
