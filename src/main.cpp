@@ -4,6 +4,13 @@
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
+#include <FastLED.h>
+
+// RGB LED setup
+#define NUM_LEDS 1
+#define LED_PIN 47
+#define BRIGHTNESS 10
+CRGB leds[NUM_LEDS];
 
 // Moisture setup
 #define MOISTURE_IN_PIN 5
@@ -271,13 +278,27 @@ void setupBME()
   }
 }
 
-void setup()
+void setBrightness(int brightness)
 {
-  Serial.begin(115200);
+  FastLED.setBrightness(brightness);
+}
 
-  setupMoistureSensor();
-  setupADC();
-  setupBME();
+void setupRGB()
+{
+  FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS);
+  setBrightness(BRIGHTNESS);
+}
+
+void setLEDColor(int r, int g, int b)
+{
+  leds[0] = CRGB(r, g, b);
+  FastLED.show();
+}
+
+void turnOffLED()
+{
+  leds[0] = CRGB(0, 0, 0);
+  FastLED.show();
 }
 
 void startPWM(int pin, int frequency, int dutyCycle)
@@ -308,6 +329,16 @@ int getAveragePercentageWithPWM()
 
   int averageMoistureValue = total / 10;
   return mapMoistureToPercentage(averageMoistureValue);
+}
+
+void setup()
+{
+  Serial.begin(115200);
+
+  setupMoistureSensor();
+  setupADC();
+  setupBME();
+  setupRGB();
 }
 
 void loop()
@@ -347,6 +378,14 @@ void loop()
   Serial.print("Altitude:");
   Serial.print(altitude);
   Serial.println();
+
+  setLEDColor(255, 0, 0);
+  delay(1000);
+  setLEDColor(0, 255, 0);
+  delay(1000);
+  setLEDColor(0, 0, 255);
+  delay(1000);
+  turnOffLED();
 
   // Wait before next measurement
   delay(1000); // 10 seconds between measurements
