@@ -11,6 +11,125 @@ int readIndex = 0;
 int totalReadings = 0;
 bool bufferFilled = false;
 
+// Voltage reading setup
+#define BATT_EN_PIN 3
+#define PHOTODIODE_EN_PIN 9
+
+#define USB_VOLTAGE_CHANNEL ADC1_CHANNEL_0
+#define BATT_VOLTAGE_CHANNEL ADC1_CHANNEL_1
+#define PHOTODIODE_VOLTAGE_CHANNEL ADC1_CHANNEL_9
+
+#define USB_VOLTAGE_R1 47000.0
+#define USB_VOLTAGE_R2 10000.0
+
+#define BATT_VOLTAGE_R1 100000.0
+#define BATT_VOLTAGE_R2 10000.0
+
+#define PHOTODIODE_VOLTAGE_R1 0
+#define PHOTODIODE_VOLTAGE_R2 10000.0
+
+#define ATTENTUATION ADC_ATTEN_DB_0
+#define WIDTH ADC_WIDTH_BIT_12
+#define DEFAULT_VREF 1100
+esp_adc_cal_characteristics_t *adc_chars;
+
+void initialize_adc()
+{
+  // Allocate memory for ADC characteristics
+  adc_chars = (esp_adc_cal_characteristics_t *)calloc(1, sizeof(esp_adc_cal_characteristics_t));
+
+  // Check eFuse calibration availability
+  if (esp_adc_cal_check_efuse(ESP_ADC_CAL_VAL_EFUSE_TP) == ESP_OK)
+  {
+    Serial.println("eFuse Two Point calibration data available.");
+  }
+  else if (esp_adc_cal_check_efuse(ESP_ADC_CAL_VAL_EFUSE_VREF) == ESP_OK)
+  {
+    Serial.println("eFuse Vref calibration data available.");
+  }
+  else
+  {
+    Serial.println("Default Vref will be used.");
+  }
+
+  // Characterize ADC
+  esp_adc_cal_value_t cal_type = esp_adc_cal_characterize(
+      ADC_UNIT_1,   // ADC unit
+      ATTENTUATION, // Attenuation
+      WIDTH,        // Bit width
+      DEFAULT_VREF, // Default Vref in mV
+      adc_chars);   // ADC characteristics structure
+
+  // Print the type of calibration used
+  if (cal_type == ESP_ADC_CAL_VAL_EFUSE_TP)
+  {
+    Serial.println("Characterized using Two Point values stored in eFuse.");
+  }
+  else if (cal_type == ESP_ADC_CAL_VAL_EFUSE_VREF)
+  {
+    Serial.println("Characterized using reference voltage stored in eFuse.");
+  }
+  else
+  {
+    Serial.println("Characterized using default reference voltage.");
+  }
+}
+
+float ReadVoltage(adc1_channel_t channel, float R1, float R2)
+{
+  uint32_t adc_reading = 0;
+  uint32_t voltage = 0;
+
+  // Take multiple samples for better accuracy
+  for (int i = 0; i < 100; i++)
+  {
+    adc_reading += adc1_get_raw(channel);
+  }
+  adc_reading /= 100;
+
+  // Convert raw ADC reading to voltage in mV
+  voltage = esp_adc_cal_raw_to_voltage(adc_reading, adc_chars);
+
+  // Calculate the real voltage using the voltage divider
+  float real_voltage = (float(voltage) * (R1 + R2)) / R2;
+  return real_voltage;
+}
+
+float ReadUSBVoltage()
+{
+  return ReadVoltage(USB_VOLTAGE_CHANNEL, USB_VOLTAGE_R1, USB_VOLTAGE_R2);
+}
+
+float ReadBatteryVoltage()
+{
+  digitalWrite(BATT_EN_PIN, HIGH);
+  return ReadVoltage(BATT_VOLTAGE_CHANNEL, BATT_VOLTAGE_R1, BATT_VOLTAGE_R2);
+  digitalWrite(BATT_EN_PIN, LOW);
+}
+
+float ReadPhotodiodeVoltage()
+{
+  digitalWrite(PHOTODIODE_EN_PIN, HIGH);
+  return ReadVoltage(PHOTODIODE_VOLTAGE_CHANNEL, PHOTODIODE_VOLTAGE_R1, PHOTODIODE_VOLTAGE_R2);
+  digitalWrite(PHOTODIODE_EN_PIN, LOW);
+}
+
+int calculateLightIntensity()
+{
+  // Constants from the datasheet
+  const float referenceCurrent = 11e-6; // 11 µA at Ee = 1 mW/cm²
+  const float referenceIntensity = 1.0; // 1 mW/cm² at the reference current
+
+  // Calculate the photocurrent (IL)
+  float voltage = ReadPhotodiodeVoltage();
+
+  float photocurrent = voltage / 10000.0; // 10kΩ resistor
+
+  // Calculate light intensity (Ee)
+  float lightIntensity = (photocurrent / referenceCurrent) * referenceIntensity;
+  return lightIntensity;
+}
+
 int mapMoistureToPercentage(int moistureValue)
 {
   if (moistureValue >= 3795)
@@ -86,11 +205,25 @@ void setupMoistureSensor()
   }
 }
 
+void setupADC()
+{
+  pinMode(BATT_EN_PIN, OUTPUT);
+  pinMode(PHOTODIODE_EN_PIN, OUTPUT);
+
+  adc1_config_width(WIDTH);
+  adc1_config_channel_atten(ADC1_CHANNEL_0, ATTENTUATION);
+  adc1_config_channel_atten(ADC1_CHANNEL_1, ATTENTUATION);
+  adc1_config_channel_atten(ADC1_CHANNEL_9, ATTENTUATION);
+
+  initialize_adc();
+}
+
 void setup()
 {
   Serial.begin(115200);
 
   setupMoistureSensor();
+  setupADC();
 }
 
 void startPWM(int pin, int frequency, int dutyCycle)
@@ -126,12 +259,24 @@ int getAveragePercentageWithPWM()
 void loop()
 {
   int percentage = getAveragePercentageWithPWM();
+  int USBVoltage = ReadUSBVoltage();
+  int batteryVoltage = ReadBatteryVoltage();
+  int lightIntensity = calculateLightIntensity();
 
   Serial.print(">");
-  Serial.print("percentage:");
+  Serial.print("Moisture:");
   Serial.print(percentage);
+  Serial.print(",");
+  Serial.print("USBVoltage:");
+  Serial.print(USBVoltage);
+  Serial.print(",");
+  Serial.print("BatteryVoltage:");
+  Serial.print(batteryVoltage);
+  Serial.print(",");
+  Serial.print("LightIntensity:");
+  Serial.print(lightIntensity);
   Serial.println();
 
   // Wait before next measurement
-  delay(100); // 10 seconds between measurements
+  delay(1000); // 10 seconds between measurements
 }
