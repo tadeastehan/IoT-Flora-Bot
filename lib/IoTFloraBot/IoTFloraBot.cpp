@@ -18,6 +18,8 @@
 #include "iot_configs.h"
 #include "IoTFloraBot.h"
 
+#include "SensorLibrary.h"
+
 // When developing for your own Arduino-based platform,
 // please follow the format '(ard;<platform>)'.
 #define AZURE_SDK_CLIENT_USER_AGENT "c%2F" AZ_SDK_VERSION_STRING "(ard;esp32)"
@@ -320,7 +322,24 @@ void establishConnection()
 
 static void generateTelemetryPayload()
 {
-    telemetry_payload = "{ \"msgCount\": " + String(telemetry_send_count++) + " }";
+    int percentage = getAveragePercentageWithPWM();
+    int USBVoltage = ReadUSBVoltage();
+    int batteryVoltage = ReadBatteryVoltage();
+    int lightIntensity = calculateLightIntensity();
+    float temperature = getTemperature();
+    float humidity = getHumidity();
+    float pressure = getPressure();
+    float altitude = getAltitude();
+
+    telemetry_payload = "{ \"msgCount\": " + String(telemetry_send_count++) +
+                        ", \"Moisture\": " + String(percentage) +
+                        ", \"USBVoltage\": " + String(USBVoltage) +
+                        ", \"BatteryVoltage\": " + String(batteryVoltage) +
+                        ", \"LightIntensity\": " + String(lightIntensity) +
+                        ", \"Temperature\": " + String(temperature) +
+                        ", \"Humidity\": " + String(humidity) +
+                        ", \"Pressure\": " + String(pressure) +
+                        ", \"Altitude\": " + String(altitude) + " }";
 }
 
 void sendTelemetry()
