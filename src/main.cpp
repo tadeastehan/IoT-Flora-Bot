@@ -1,36 +1,28 @@
 #include <Arduino.h>
-#include <WiFi.h>
 #include <IoTFloraBot.h>
-#include <iot_configs.h>
-#include <SensorLibrary.h>
+#include "iot_configs.h"
 
-static unsigned long next_telemetry_send_time_ms = 0;
+unsigned long previousMillis = 0; // To keep track of the last update time
 
 void setup()
 {
-  setupMoistureSensor();
-  setupADC();
-  setupBME();
-  setupRGB();
+  Serial.begin(115200);
 
+  // Establish connection
+  setupSensors();
   establishConnection();
-
-  Serial.begin(115200); // init serial monitor
 }
 
 void loop()
 {
-  if (WiFi.status() != WL_CONNECTED)
-  {
-    connectToWiFi();
-  }
+  unsigned long currentMillis = millis();
 
-  else if (millis() > next_telemetry_send_time_ms)
+  // Send data every 10 seconds
+  if (currentMillis - previousMillis >= TELEMETRY_FREQUENCY_MILLISECS)
   {
+    previousMillis = currentMillis;
+
+    // Send telemetry data
     sendTelemetry();
-    next_telemetry_send_time_ms = millis() + TELEMETRY_FREQUENCY_MILLISECS;
   }
-
-  // Wait before next measurement
-  delay(1000); // 10 seconds between measurements
 }

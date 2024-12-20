@@ -1,9 +1,11 @@
 #ifndef IOTFLORABOT_H
 #define IOTFLORABOT_H
 
-// Function declarations
+#include <Arduino.h>
+
+void setupSensors();
 void establishConnection();
-void connectToWiFi();
+String generateTelemetryPayload();
 void sendTelemetry();
 
 #endif // IOTFLORABOT_H
