@@ -16,13 +16,19 @@ void setupSensors()
     setupRGB();
 }
 
-void establishConnection()
+bool establishConnection()
 {
     // Connect to WiFi
-    connectToWiFi(IOT_CONFIG_WIFI_SSID, IOT_CONFIG_WIFI_PASSWORD);
+    if (!connectToWiFi(IOT_CONFIG_WIFI_SSID, IOT_CONFIG_WIFI_PASSWORD))
+    {
+        Serial.println("Failed to connect to WiFi");
+        return false;
+    }
 
     // Initialize NTP client
     initializeNTP();
+
+    return true;
 }
 
 String generateTelemetryPayload()

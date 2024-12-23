@@ -4,16 +4,29 @@
 WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, "pool.ntp.org", 0, 60000); // UTC timezone, update every 60 seconds
 
-void connectToWiFi(const char *ssid, const char *password)
+bool connectToWiFi(const char *ssid, const char *password)
 {
+
+    int retries = 0;
     Serial.print("Connecting to WiFi...");
     WiFi.begin(ssid, password);
-    while (WiFi.status() != WL_CONNECTED)
+    while (WiFi.status() != WL_CONNECTED && retries < 20)
     {
         delay(500);
         Serial.print(".");
+        retries++;
     }
-    Serial.println("\nConnected to WiFi");
+
+    if (WiFi.status() == WL_CONNECTED)
+    {
+        Serial.println("Connected to the WiFi network");
+        return true;
+    }
+    else
+    {
+        Serial.println("Failed to connect to the WiFi network");
+        return false;
+    }
 }
 
 void initializeNTP()

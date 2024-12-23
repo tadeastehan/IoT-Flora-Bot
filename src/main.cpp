@@ -14,10 +14,12 @@ void setup()
 
   // Establish connection
   setupSensors();
-  establishConnection();
 
-  // Send telemetry data
-  sendTelemetry();
+  // Send telemetry data if connection is established
+  if (establishConnection())
+  {
+    sendTelemetry();
+  }
 
   Serial.println("Going to sleep now");
   Serial.flush();

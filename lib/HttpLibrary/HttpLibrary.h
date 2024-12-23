@@ -7,9 +7,9 @@
 #include <NTPClient.h>
 
 // Function declarations
-void connectToWiFi(const char* ssid, const char* password);
+bool connectToWiFi(const char *ssid, const char *password);
 void initializeNTP();
 unsigned long getEpochTime();
-void sendDataToGrafanaLoki(const char* url, const char* user, const char* apiKey, const String& payload);
+void sendDataToGrafanaLoki(const char *url, const char *user, const char *apiKey, const String &payload);
 
 #endif // HTTPLIBRARY_H

@@ -4,7 +4,7 @@
 #include <Arduino.h>
 
 void setupSensors();
-void establishConnection();
+bool establishConnection();
 String generateTelemetryPayload();
 void sendTelemetry();
 
