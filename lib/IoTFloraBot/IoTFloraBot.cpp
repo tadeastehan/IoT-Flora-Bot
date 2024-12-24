@@ -331,8 +331,7 @@ static void generateTelemetryPayload()
     float pressure = getPressure();
     float altitude = getAltitude();
 
-    telemetry_payload = "{ \"msgCount\": " + String(telemetry_send_count++) +
-                        ", \"Moisture\": " + String(percentage) +
+    telemetry_payload = "{ \"Moisture\": " + String(percentage) +
                         ", \"USBVoltage\": " + String(USBVoltage) +
                         ", \"BatteryVoltage\": " + String(batteryVoltage) +
                         ", \"LightIntensity\": " + String(lightIntensity) +
