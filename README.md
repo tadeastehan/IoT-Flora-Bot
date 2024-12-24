@@ -21,7 +21,7 @@ After measurements I've conducted, I measured that the deep sleep amperage is ar
 &nbsp; &nbsp; &nbsp; &nbsp;
 <img alt="Dark" align="left" src="docs/images/grafana_screenshot.png" width="45%" alt="Grafana screenshot of the data sent to the cloud">
 
-<br/><br/><br/><br/><br/>
+<br/><br/><br/><br/><br/><br>
 
 ### PCB design
 
