@@ -23,6 +23,7 @@ After measurements I've conducted, I measured that the deep sleep amperage is ar
 
 <br/><br/><br/><br/><br/><br><br/><br>
 
+
 ### PCB design
 
 I've designed the PCB using EasyEDA software and manufactured and assembled it using JLCPCB. You can see the project's details and order your own PCBs from the following link:
