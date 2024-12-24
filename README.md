@@ -17,15 +17,11 @@ $$
 
 After measurements I've conducted, I measured that the deep sleep amperage is around 0.7mA and peak amperage of sending is 110mA when the average sending time is 3 seconds.
 
-<div class="grid" markdown>
+<img alt="Light" align="left" src="docs/images/amperage_over_time.png" width="45%" alt="Amperage vs Time graph while sending 6x data to cloud">
+&nbsp; &nbsp; &nbsp; &nbsp;
+<img alt="Dark" align="left" src="docs/images/grafana_screenshot.png" width="45%" alt="Grafana screenshot of the data sent to the cloud">
 
-![Amperage vs Time graph while sending 6x data to cloud](docs/images/amperage_over_time.png)
-Ampere vs Time graph while sending 6x data to cloud
-
-![Received voltage data to cloud](docs/images/image.png)
-Received voltage data to cloud
-
-</div>
+<br/><br/><br/><br/><br/>
 
 ### PCB design
 
