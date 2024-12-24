@@ -3,8 +3,8 @@
 In this project I've designed from scratch functional PCB to measure the soil moisture, temperature, humidity and light intensity around the plant. The data is sent to the cloud and displayed on a web page. The system is powered by 3.7 Li-pol battery. The system is designed to be used in a greenhouse or a garden to monitor the plant's health and alert the user when plant needs water, light or temperature is too low.
 
 ### Connection to the cloud
-For sending the data, I am using the free tier of Grafana Cloud, which allows for 50 GB of data with a retention period of 14 days. This is suitable for this application because we do not need to see historical data if we are not that curious.
 
+For sending the data, I am using the free tier of Grafana Cloud, which allows for 50 GB of data with a retention period of 14 days. This is suitable for this application because we do not need to see historical data if we are not that curious.
 
 ### Power consumption
 
@@ -17,18 +17,18 @@ $$
 
 After measurements I've conducted, I measured that the deep sleep amperage is around 0.7mA and peak amperage of sending is 110mA when the average sending time is 3 seconds.
 
-<div style="display: flex; justify-content: space-around;">
-  <figure style="width: 45%;">
-    <img src="docs/images/amperage_over_time.png" alt="Amperage vs Time graph while sending 6x data to cloud">
-    <figcaption>Amperage vs Time graph while sending 6x data to cloud</figcaption>
-  </figure>
-  <figure style="width: 45%;">
-    <img src="docs/images/image.png" alt="Received voltage data to cloud">
-    <figcaption>Received voltage data to cloud</figcaption>
-  </figure>
+<div class="grid" markdown>
+
+![Amperage vs Time graph while sending 6x data to cloud](docs/images/amperage_over_time.png)
+Ampere vs Time graph while sending 6x data to cloud
+
+![Received voltage data to cloud](docs/images/image.png)
+Received voltage data to cloud
+
 </div>
 
 ### PCB design
+
 I've designed the PCB using EasyEDA software and manufactured and assembled it using JLCPCB. You can see the project's details and order your own PCBs from the following link:
 
 [TO DO](https://jlcpcb.com)
