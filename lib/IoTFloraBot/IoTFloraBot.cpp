@@ -35,7 +35,8 @@ String generateTelemetryPayload()
 {
     String telemetry_payload = "";
 
-    int percentage = getAveragePercentageWithPWM();
+    int moistureRaw = getSmoothedMoistureReading();
+    int moisturePercentage = getAveragePercentageWithPWM();
     int USBVoltage = ReadUSBVoltage();
     int batteryVoltage = ReadBatteryVoltage();
     int lightIntensity = calculateLightIntensity();
@@ -45,7 +46,8 @@ String generateTelemetryPayload()
     float altitude = getAltitude();
 
     telemetry_payload = "\"{" +
-                        String("\\\"Moisture\\\": ") + String(percentage) + ", " +
+                        String("\\\"MoistureRaw\\\": ") + String(moistureRaw) + ", " +
+                        String("\\\"MoisturePercentage\\\": ") + String(moisturePercentage) + ", " +
                         String("\\\"USBVoltage\\\": ") + String(USBVoltage) + ", " +
                         String("\\\"BatteryVoltage\\\": ") + String(batteryVoltage) + ", " +
                         String("\\\"LightIntensity\\\": ") + String(lightIntensity) + ", " +

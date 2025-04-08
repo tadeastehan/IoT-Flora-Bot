@@ -34,5 +34,6 @@ void turnOffLED();
 void startPWM(int pin, int frequency, int dutyCycle);
 void stopPWM(int pin);
 int getAveragePercentageWithPWM();
+int getSmoothedMoistureReading();
 
 #endif // SENSORLIBRARY_H

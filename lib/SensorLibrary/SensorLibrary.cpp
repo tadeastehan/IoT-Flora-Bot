@@ -178,33 +178,6 @@ int getSmoothedReading(int newReading)
     return totalReadings / WINDOW_SIZE;
 }
 
-void updateMoistureValue()
-{
-    int rawMoistureValue = analogRead(MOISTURE_OUT_PIN);
-    int smoothedValue = getSmoothedReading(rawMoistureValue);
-
-    Serial.print(">");
-    Serial.print("moisture:");
-    Serial.print(smoothedValue);
-    Serial.print(",");
-    Serial.print("percentage:");
-    Serial.print(mapMoistureToPercentage(smoothedValue));
-    Serial.println();
-}
-
-int getAveragePercentage()
-{
-    int total = 0;
-    for (int i = 0; i < 10; i++)
-    {
-        int rawMoistureValue = analogRead(MOISTURE_OUT_PIN);
-        total += rawMoistureValue;
-        delay(10); // Small delay between readings
-    }
-    int averageMoistureValue = total / 10;
-    return mapMoistureToPercentage(averageMoistureValue);
-}
-
 float getHumidity()
 {
     return bme.readHumidity();
@@ -305,6 +278,38 @@ void startPWM(int pin, int frequency, int dutyCycle)
 void stopPWM(int pin)
 {
     ledcDetachPin(pin);
+}
+
+int getAverageMoistureWithPWM()
+{
+    startPWM(MOISTURE_IN_PIN, 1500000, 30); // Generate PWM signal on MOISTURE_IN
+    delay(100);
+
+    int total = 0;
+    for (int i = 0; i < 10; i++)
+    {
+        int rawMoistureValue = analogRead(MOISTURE_OUT_PIN);
+        total += rawMoistureValue;
+        delay(10); // Small delay between readings
+    }
+    stopPWM(MOISTURE_IN_PIN);
+
+    int averageMoistureValue = total / 10;
+    return averageMoistureValue;
+}
+
+int getSmoothedMoistureReading()
+{
+    for (int i = 0; i < WINDOW_SIZE; i++)
+    {
+        int rawMoistureValue = getAverageMoistureWithPWM();
+        getSmoothedReading(rawMoistureValue);
+        delay(10); // Small delay between readings
+    }
+
+    // Add last reading
+    int rawMoistureValue = getAverageMoistureWithPWM();
+    return getSmoothedReading(rawMoistureValue);
 }
 
 int getAveragePercentageWithPWM()
