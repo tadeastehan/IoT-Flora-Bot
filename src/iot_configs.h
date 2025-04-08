@@ -8,4 +8,5 @@
 #define IOT_CONFIG_DEVICE_ID ""
 #define IOT_CONFIG_DEVICE_KEY ""
 
-#define TELEMETRY_FREQUENCY_SECS 60 * 5 // 5 minutes
+#define TELEMETRY_FREQUENCY_SECS 60 * 5      // 5 minutes
+#define TELEMETRY_FREQUENCY_SECS_INTERVAL 10 // 10 seconds
