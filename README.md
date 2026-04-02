@@ -33,6 +33,13 @@ I've designed the PCB using EasyEDA software and manufactured and assembled it u
 > [!CAUTION]
 > Check the polarity of the battery before connecting it to the PCB. The connector negative pin is marked with a white dot. The battery is connected to the PCB with a JST-PH-2 2mm connector. As there is no uniform standard for colour marking, the colour fitting of this cable may be different in some cases!
 
+> [!CAUTION]
+> **PCB rev. 1.0.0 — GPIO 48 / BUS_PWR critical hardware bug:** On this revision of the PCB, GPIO 48 (ESP32-WROOM module pin 48, second pad from the right in the bottom row of ESP32-WROOM pads) is incorrectly connected via the `BUS_PWR` net flag to the VIN pin of the LDO. This means battery voltage (3.7–4.2 V) — or potentially 5 V from USB — is being pumped directly into GPIO 48, which can damage the ESP32-S3.
+>
+> **How to fix (rev. 1.0.0):** Cut the trace connected to GPIO 48 on the ESP32-WROOM module. The affected pad is the **second from the right in the bottom row of pads** on the ESP32-WROOM board. Use a sharp hobby knife or scalpel to carefully cut the trace between the ESP32-WROOM GPIO 48 pad and the rest of the PCB. Verify the cut with a multimeter (no continuity between GPIO 48 pad and the LDO VIN / BUS_PWR net).
+>
+> This issue will be corrected in the next PCB revision by rerouting the `BUS_PWR` net away from GPIO 48.
+
 ### Future improvements
 
 1. Use standardised battery connector to not get the battery polarity wrong.
