@@ -1,5 +1,10 @@
 # IoT Flora Bot
 
+<p align="center">
+	<img src="docs/images/IoT-FloraBot-3Dprint.jpg" alt="3D Print" width="45%" />
+	<img src="docs/images/IoT-FloraBot-PCB.jpg" alt="Amperage vs Time" width="45%" />
+</p>
+
 In this project I've designed from scratch functional PCB to measure the soil moisture, temperature, humidity and light intensity around the plant. The data is sent to the cloud and displayed on a web page. The system is powered by 3.7 Li-pol battery. The system is designed to be used in a greenhouse or a garden to monitor the plant's health and alert the user when plant needs water, light or temperature is too low.
 
 ### Connection to the cloud
@@ -22,7 +27,6 @@ After measurements I've conducted, I measured that the deep sleep amperage is ar
 <img alt="Dark" align="left" src="docs/images/grafana_screenshot.png" width="45%" alt="Grafana screenshot of the data sent to the cloud">
 
 <br/><br/><br/><br/><br/><br><br/><br><br/><br>
-
 
 ### PCB design
 
